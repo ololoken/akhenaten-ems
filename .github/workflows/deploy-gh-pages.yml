@@ -1,0 +1,51 @@
+name: build and deploy akhenaten-launcher
+on: 
+  push:
+    branches:
+      - main
+jobs:
+
+  build-akhenaten-emscripten-module:
+    runs-on: ubuntu-latest
+    container: emscripten/emsdk:3.1.74
+    steps:
+      - name: Checkout Akhenaten️☥️
+        uses: actions/checkout@v4
+        with:
+          repository: ololoken/Akhenaten
+          ref: refs/heads/main
+      - name: Build Akhenaten️ wasm module 🔧
+        run: |
+          git config --global --add safe.directory "*"
+          mkdir -p akhenaten-emscripten-module
+          mkdir -p build
+          cd build
+          emcmake cmake ../ -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain/Emscripten.cmake && emmake make
+          cd ..
+          cp build/akhenaten.js akhenaten-emscripten-module/
+          cp build/akhenaten.wasm akhenaten-emscripten-module/
+      - name: Store Akhenaten☥ wasm artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: akhenaten-emscripten-module
+          path: akhenaten-emscripten-module
+
+  build-Akhenaten-ems-launcher:
+    runs-on: ubuntu-latest
+    needs: build-akhenaten-emscripten-module
+    steps:
+      - name: Checkout launcher 🛎️
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: akhenaten-emscripten-module
+          path: src/assets/akhenaten/
+      - name: Install and Build 🔧
+        run: |
+          npm install
+          npm run build
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages-demo
+          folder: dist

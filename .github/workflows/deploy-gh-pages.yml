@@ -13,14 +13,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ololoken/Akhenaten
-          ref: refs/heads/main
+          ref: refs/heads/master
       - name: Build Akhenaten️ wasm module 🔧
         run: |
           git config --global --add safe.directory "*"
           mkdir -p akhenaten-emscripten-module
           mkdir -p build
           cd build
-          emcmake cmake ../ -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain/Emscripten.cmake && emmake make
+          emcmake cmake ../ -DCMAKE_BUILD_PLATFORM=win_emscripten -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-sMODULARIZE -sALLOW_MEMORY_GROWTH -sENVIRONMENT=web -sEXPORTED_RUNTIME_METHODS=callMain -sEXPORT_ALL -lidbfs.js -sCASE_INSENSITIVE_FS -sEXPORT_NAME=akhenatem -sASYNCIFY -sASYNCIFY_REMOVE=*js_*" -DCMAKE_CXX_FLAGS="" && emmake make
           cd ..
           cp build/akhenaten.js akhenaten-emscripten-module/
           cp build/akhenaten.wasm akhenaten-emscripten-module/

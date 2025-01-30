@@ -41,6 +41,8 @@ jobs:
           name: akhenaten-emscripten-module
           path: src/assets/akhenaten/
       - name: Install and Build 🔧
+        env:
+          VITE_BASE: /akhenaten-ems
         run: |
           npm install
           npm run build

@@ -8,7 +8,7 @@ export default defineConfig({
   root: dirname(fileURLToPath(import.meta.url)),
   plugins: [react(), commonjs()],
   envPrefix: 'AKH',
-  base: '/akhenaten-ems',
+  base: process.env.VITE_BASE ?? '/',
   clearScreen: false,
   build: {
     outDir: './dist/',

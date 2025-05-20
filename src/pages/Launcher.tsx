@@ -31,8 +31,8 @@ import TerminalIcon from '../components/icons/TerminalIcon';
 import UploadIcon from '../components/icons/UploadIcon';
 import ZipIcon from '../components/icons/ZipIcon';
 
-import { ModuleInstance } from './module'
-import {directoryInputHandler, zipInputReader} from './dataInput';
+import { ModuleInstance } from '../assets/module/module'
+import { directoryInputHandler, zipInputReader } from './dataInput';
 import useConfig from '../hooks/useConfig';
 import throwExpression from "../common/throwExpression.ts";
 
@@ -80,6 +80,19 @@ export default () => {
     return () => canvas.current?.removeEventListener('contextmenu', handler);
   }, [canvas]);
 
+  useEffect(() => {//mute on tab goes invisible state
+    if (!instance) return;
+    const handler = () => {
+      if (document.hidden) {
+        instance.SDL2?.audioContext.suspend();
+      } else {
+        instance.SDL2?.audioContext.resume();
+      }
+    }
+    document.addEventListener('visibilitychange', handler);
+    return () => document.removeEventListener('visibilitychange', handler);
+  }, [instance]);
+
   useEffect(function critical () {//init wasm module instance
     if (!canvas.current) return;
     if ((critical as any)['lock']) return;
@@ -90,6 +103,9 @@ export default () => {
       canvas: canvas.current,
       pushMessage,
       reportDownloadProgress,
+      onExit: (code) => {
+        console.log('exit code', code);
+      }
     }).then(setInstance)
       .catch(e => pushMessage(`WASM module start failed ${e}`))
   }, [canvas])
@@ -216,7 +232,9 @@ export default () => {
       }}
     >
       <CardHeader
-        titleTypographyProps={{ variant: 'subtitle1' }}
+        slotProps={{
+          title: { variant: 'subtitle1' }
+        }}
         title={''}
         sx={{ p: '8px 12px', height: '44px', '& .MuiCardHeader-action': { width: '100%' } }}
         action={<>

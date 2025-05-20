@@ -1,8 +1,8 @@
-import { Module, ModuleInitParams } from '../types/Module';
+import { Module, ModuleInitParams } from '../../types/Module';
 
-import wasm from '../assets/akhenaten/akhenaten.wasm?url'
+import wasm from './akhenaten.wasm?url'
 
-import akhenaten from '../assets/akhenaten/akhenaten';
+import akhenaten from './akhenaten';
 
 export const ModuleInstance = ({ ENV, reportDownloadProgress, pushMessage, canvas }: ModuleInitParams) => {
 
